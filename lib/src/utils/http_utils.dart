@@ -11,9 +11,8 @@ class Http {
   static const IS_DEV = false;
 
   // static const String _host = "cosbiome.online";
-  static const String _host = IS_DEV
-      ? "http://localhost:1337/"
-      : "https://movimiento-ciudadano-backend-0a72600137cb.herokuapp.com/";
+  static const String _host =
+      IS_DEV ? "http://localhost:1337/" : "https://cosbiome.online/";
 
   static final Map<String, String> _headers = {
     'Content-Type': 'application/json',

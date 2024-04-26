@@ -16,7 +16,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void initState() {
     Future.delayed(Duration.zero, () async {
       if (PreferencesUtils.getBool('isLogged')) {
-        Navigator.pushReplacementNamed(context, '/marcaciones');
+        Navigator.pushReplacementNamed(context, '/home');
       }
     });
     super.initState();
@@ -133,11 +133,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               }
               return null;
             },
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Usuario',
-              // border: OutlineInputBorder(
-              //   borderRadius: BorderRadius.circular(14.0),
-              // ),
             ),
           ),
           const SizedBox(height: 16),
@@ -152,11 +149,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               }
               return null;
             },
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: 'Contraseña',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14.0),
-              ),
             ),
           ),
           const SizedBox(height: 10),

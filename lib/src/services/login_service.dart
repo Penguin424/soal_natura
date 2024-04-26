@@ -35,7 +35,7 @@ class LoginService extends ChangeNotifier {
     try {
       if (_formKey.currentState!.validate()) {
         final loginData = await Http.login(
-          'api/auth/local',
+          'auth/local',
           jsonEncode(
             {
               "identifier": _indentifier,
@@ -56,7 +56,7 @@ class LoginService extends ChangeNotifier {
 
         if (!mounted) return;
 
-        Navigator.pushReplacementNamed(context, '/marcaciones');
+        Navigator.pushReplacementNamed(context, '/home');
       }
     } catch (e) {
       print("Error: $e");

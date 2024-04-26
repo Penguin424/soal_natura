@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:soal_natura/src/screens/home_screen.dart';
 import 'package:soal_natura/src/screens/login_screen.dart';
+import 'package:soal_natura/src/screens/ventas/ventas_registro_screen.dart';
+import 'package:soal_natura/src/utils/preferences_utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await PreferencesUtils.init();
 
   runApp(
     const ProviderScope(
@@ -50,7 +55,14 @@ class MyApp extends StatelessWidget {
         ),
         appBarTheme: const AppBarTheme(
           centerTitle: true,
-          foregroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
+          ),
         ),
         colorScheme: ColorScheme.fromSwatch().copyWith(
           primary: const Color(0XFF97B446),
@@ -70,6 +82,8 @@ class MyApp extends StatelessWidget {
       initialRoute: "/login",
       routes: {
         "/login": (context) => const LoginScreen(),
+        "/home": (context) => const HomeScreen(),
+        "/ventas/registro": (context) => const VentasRegistroScreen(),
       },
     );
   }

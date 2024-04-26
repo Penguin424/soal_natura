@@ -16,7 +16,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void initState() {
     Future.delayed(Duration.zero, () async {
       if (PreferencesUtils.getBool('isLogged')) {
-        Navigator.pushReplacementNamed(context, '/marcaciones');
+        Navigator.pushReplacementNamed(context, '/home');
       }
     });
     super.initState();

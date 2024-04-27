@@ -34,6 +34,7 @@ class _VentasRegistroScreenState extends ConsumerState<VentasRegistroScreen> {
           constraints: BoxConstraints(
             minHeight: size.height * 0.3,
             minWidth: size.width,
+
           ),
           child: const ColSalesWiget(),
         ),

@@ -43,7 +43,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
           child: Stack(
             children: [
-              _IconHeard(), // Agrega el widget _IconHeard aquí
+              const _IconHeard(), // Agrega el widget _IconHeard aquí
               Center(
                 child: SingleChildScrollView(
                   child: Padding(

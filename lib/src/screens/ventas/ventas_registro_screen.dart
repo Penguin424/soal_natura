@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:soal_natura/src/widgets/col_sale_widget.dart';
 import 'package:soal_natura/src/widgets/drawe_widget.dart';
 
 class VentasRegistroScreen extends ConsumerStatefulWidget {
@@ -20,29 +21,21 @@ class _VentasRegistroScreenState extends ConsumerState<VentasRegistroScreen> {
       appBar: AppBar(
         title: const Text('Resgistro de ventas'),
       ),
-      body: Container(
-        margin: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        constraints: BoxConstraints(
-          minHeight: size.height * 0.3,
-          minWidth: size.width,
-        ),
-        child: const Form(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Text(
-                    "FORMULARIO DE REGISTRO DE VENTAS AQUI",
-                  ),
-                ),
-              ],
-            ),
+      body: Center(
+        child: Container(
+          margin: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: Colors.black,
+                width: 1.5,
+              )),
+          constraints: BoxConstraints(
+            minHeight: size.height * 0.3,
+            minWidth: size.width,
           ),
+          child: const ColSalesWiget(),
         ),
       ),
     );

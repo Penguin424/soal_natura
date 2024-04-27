@@ -4,6 +4,7 @@ import 'package:soal_natura/src/screens/home_screen.dart';
 import 'package:soal_natura/src/screens/login_screen.dart';
 import 'package:soal_natura/src/screens/ventas/ventas_registro_screen.dart';
 import 'package:soal_natura/src/utils/preferences_utils.dart';
+import 'package:soal_natura/src/widgets/col_sale_widget.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -84,6 +85,7 @@ class MyApp extends StatelessWidget {
         "/login": (context) => const LoginScreen(),
         "/home": (context) => const HomeScreen(),
         "/ventas/registro": (context) => const VentasRegistroScreen(),
+        "/sales": (context) => const ColSalesWiget()
       },
     );
   }

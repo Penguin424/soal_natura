@@ -34,6 +34,7 @@ class _VentasRegistroScreenState extends ConsumerState<VentasRegistroScreen> {
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Center(
                   child: Text(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soal_natura/src/widgets/col_sale_widget.dart';
+import 'package:soal_natura/src/widgets/col_sales_widget.dart';
 import 'package:soal_natura/src/widgets/drawe_widget.dart';
 
 class VentasRegistroScreen extends ConsumerStatefulWidget {

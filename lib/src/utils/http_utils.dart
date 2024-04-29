@@ -8,7 +8,7 @@ class Http {
   }
   Http._internal();
 
-  static const IS_DEV = false;
+  static const IS_DEV = true;
 
   // static const String _host = "cosbiome.online";
   static const String _host =

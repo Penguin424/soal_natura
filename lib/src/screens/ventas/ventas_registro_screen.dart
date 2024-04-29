@@ -25,16 +25,23 @@ class _VentasRegistroScreenState extends ConsumerState<VentasRegistroScreen> {
         child: Container(
           margin: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: Colors.black,
+              width: 0.5,
+            ),
+            boxShadow: const [
+              BoxShadow(
                 color: Colors.black,
-                width: 1.5,
-              )),
+                blurRadius: 5,
+                offset: Offset(1, 2),
+              ),
+            ],
+          ),
           constraints: BoxConstraints(
             minHeight: size.height * 0.3,
             minWidth: size.width,
-
           ),
           child: const ColSalesWiget(),
         ),

@@ -53,16 +53,12 @@ class VentaRegistroFormModel {
   "de": "10:00",
   "a": "15:00",
   "formaDePago": "COD",
-  "createdAt": "2024-04-27T16:48:45.677Z",
-  "updatedAt": "2024-04-27T16:48:51.726Z",
-  "publishedAt": "2024-04-27T16:48:51.579Z",
   "cliente": 1,
   "direccion": 1,
   "vendedor": 1
 } 
 */
 
-  int? id;
   List<VentaRegistroFormModelProductos?>? productos;
   String? fechaEntrega;
   String? idPedido;
@@ -73,15 +69,11 @@ class VentaRegistroFormModel {
   String? de;
   String? a;
   String? formaDePago;
-  String? createdAt;
-  String? updatedAt;
-  String? publishedAt;
   int? cliente;
   int? direccion;
   int? vendedor;
 
   VentaRegistroFormModel({
-    this.id,
     this.productos,
     this.fechaEntrega,
     this.idPedido,
@@ -92,15 +84,11 @@ class VentaRegistroFormModel {
     this.de,
     this.a,
     this.formaDePago,
-    this.createdAt,
-    this.updatedAt,
-    this.publishedAt,
     this.cliente,
     this.direccion,
     this.vendedor,
   });
   VentaRegistroFormModel.fromJson(Map<String, dynamic> json) {
-    id = json['id']?.toInt();
     if (json['productos'] != null) {
       final v = json['productos'];
       final arr0 = <VentaRegistroFormModelProductos>[];
@@ -118,16 +106,13 @@ class VentaRegistroFormModel {
     de = json['de']?.toString();
     a = json['a']?.toString();
     formaDePago = json['formaDePago']?.toString();
-    createdAt = json['createdAt']?.toString();
-    updatedAt = json['updatedAt']?.toString();
-    publishedAt = json['publishedAt']?.toString();
     cliente = json['cliente']?.toInt();
     direccion = json['direccion']?.toInt();
     vendedor = json['vendedor']?.toInt();
   }
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['id'] = id;
+
     if (productos != null) {
       final v = productos;
       final arr0 = [];
@@ -145,9 +130,6 @@ class VentaRegistroFormModel {
     data['de'] = de;
     data['a'] = a;
     data['formaDePago'] = formaDePago;
-    data['createdAt'] = createdAt;
-    data['updatedAt'] = updatedAt;
-    data['publishedAt'] = publishedAt;
     data['cliente'] = cliente;
     data['direccion'] = direccion;
     data['vendedor'] = vendedor;

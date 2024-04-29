@@ -19,40 +19,64 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Row(
+                Row(
                   children: [
                     _FormRegister(
                       text: 'Nombre',
                       hintText: 'Nombre',
+                      onChanged: (context) {},
+                      validator: (context) {
+                        return null;
+                      },
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     _FormRegister(
                       text: 'Teléfono',
                       hintText: 'Teléfono',
+                      onChanged: (context) {},
+                      validator: (context) {
+                        return null;
+                      },
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
-                const Row(
+                Row(
                   children: [
                     _FormRegister(
                       text: 'Calle',
                       hintText: 'Calle',
+                      onChanged: (context) {},
+                      validator: (context) {
+                        return null;
+                      },
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     _FormRegister(
                       text: 'Colonia',
                       hintText: 'Colonia',
+                      onChanged: (context) {},
+                      validator: (context) {
+                        return null;
+                      },
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     _FormRegister(
                       text: 'Municipio',
                       hintText: 'Municipio',
+                      onChanged: (context) {},
+                      validator: (context) {
+                        return null;
+                      },
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     _FormRegister(
                       text: 'Estado',
                       hintText: 'Estado',
+                      onChanged: (context) {},
+                      validator: (context) {
+                        return null;
+                      },
                     ),
                   ],
                 ),
@@ -83,9 +107,13 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                         ),
                       ),
                     ),
-                    const _FormRegister(
+                    _FormRegister(
                       text: 'Cruces',
                       hintText: 'Cruces',
+                      onChanged: (context) {},
+                      validator: (context) {
+                        return null;
+                      },
                     ),
                   ],
                 ),
@@ -116,9 +144,13 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                         ),
                       ),
                     ),
-                    const _FormRegister(
+                    _FormRegister(
                       text: 'Producto',
                       hintText: 'Producto',
+                      onChanged: (context) {},
+                      validator: (context) {
+                        return null;
+                      },
                     ),
                   ],
                 ),
@@ -129,28 +161,44 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                   color: Colors.amber,
                 ),
                 const SizedBox(height: 30),
-                const Row(
+                Row(
                   children: [
                     _FormRegister(
                       text: 'Tipo de Venta',
                       hintText: 'Tipo de Venta',
+                      onChanged: (context) {},
+                      validator: (context) {
+                        return null;
+                      },
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     _FormRegister(
                       text: 'Método de Pago',
                       hintText: 'Método de Pago',
+                      onChanged: (context) {},
+                      validator: (context) {
+                        return null;
+                      },
                     ),
                   ],
                 ),
                 const SizedBox(height: 10),
-                const Row(
+                Row(
                   children: [
                     _FormRegister(
                       text: 'Fecha de Entrega',
+                      onChanged: (context) {},
+                      validator: (context) {
+                        return null;
+                      },
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     _FormRegister(
                       text: 'Nota',
+                      validator: (context) {
+                        return;
+                      },
+                      onChanged: (context) {},
                     ),
                   ],
                 ),
@@ -166,14 +214,16 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
 class _FormRegister extends StatelessWidget {
   final String text;
   final String? hintText;
-  final void Function(String)? onChanged;
-  final String? Function(String?)? validator;
+  final void Function(String) onChanged;
+  final String? Function(String?) validator;
+  final void Function(String)? additionalOnChange;
 
   const _FormRegister({
     required this.text,
     this.hintText,
-    this.onChanged,
-    this.validator,
+    required this.onChanged,
+    required this.validator,
+    this.additionalOnChange,
   });
 
   @override
@@ -196,8 +246,18 @@ class _FormRegister extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hintText,
             ),
-            onChanged: onChanged,
-            validator: validator,
+            onChanged: (value) {
+              onChanged(value);
+              if (additionalOnChange != null) {
+                additionalOnChange!(value);
+              }
+            },
+            validator: (value) {
+              if (value?.isEmpty ?? true) {
+                return 'Ingrese la información correspondiente';
+              }
+              return null;
+            },
           ),
         ],
       ),

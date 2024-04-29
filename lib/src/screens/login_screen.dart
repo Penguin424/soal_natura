@@ -43,6 +43,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
           child: Stack(
             children: [
+              const _IconHeard(), // Agrega el widget _IconHeard aquí
               Center(
                 child: SingleChildScrollView(
                   child: Padding(
@@ -134,8 +135,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               return null;
             },
             decoration: const InputDecoration(
-              labelText: 'Usuario',
-            ),
+                labelText: 'Usuario',
+                labelStyle: TextStyle(
+                  color: Colors.black,
+                )
+                // border: OutlineInputBorder(
+                //   borderRadius: BorderRadius.circular(14.0),
+                // ),
+                ),
           ),
           const SizedBox(height: 16),
           TextFormField(
@@ -149,29 +156,122 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               }
               return null;
             },
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Contraseña',
+              labelStyle: const TextStyle(
+                color: Colors.black,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14.0),
+              ),
             ),
           ),
           const SizedBox(height: 10),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(36.0),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 15),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    side: const BorderSide(
+                      color: Colors.black,
+                    )),
               ),
-            ),
-            onPressed: () {
-              login.handleLogin(context);
-            },
-            child: const Text(
-              'Iniciar sesión',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+              onPressed: () {
+                if (login.formKey.currentState!.validate()) {
+                  // Si el formulario es válido, realiza la acción de inicio de sesión
+                  login.handleLogin(context);
+                } else {
+                  // Si el formulario no es válido, muestra un diálogo indicando el error
+                  showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                            title: Container(
+                              decoration: const BoxDecoration(
+                                  color: Colors.blue,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30))),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 30, vertical: 10),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.info,
+                                        size: 40, color: Colors.red),
+                                    SizedBox(width: 20),
+                                    Text(
+                                      '¡Alerta!',
+                                      style: TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            content: const Text(
+                                'El correo o la contraseña están incorrectos',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold)),
+                            actions: <Widget>[
+                              TextButton(
+                                style: ButtonStyle(
+                                  overlayColor:
+                                      MaterialStateProperty.all(Colors.yellow),
+                                ),
+                                onPressed: () =>
+                                    Navigator.pop(context, 'Cancel'),
+                                child: const Text('Aceptar',
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        shadows: [
+                                          BoxShadow(
+                                              color: Colors.black,
+                                              blurRadius: 10)
+                                        ])),
+                              ),
+                            ],
+                          ));
+                }
+              },
+              child: const Padding(
+                padding: EdgeInsets.only(top: 10, bottom: 10),
+                child: Text(
+                  'Iniciar sesión',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _IconHeard extends StatelessWidget {
+  const _IconHeard();
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 15),
+        width: double.infinity,
+        child: const Icon(
+          Icons.person_pin,
+          size: 130,
+          color: Colors.white,
+          shadows: [BoxShadow(color: Colors.white, blurRadius: 50)],
+        ),
       ),
     );
   }

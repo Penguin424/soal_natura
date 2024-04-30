@@ -27,19 +27,19 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(5),
           ),
           activeIndicatorBorder: const BorderSide(
             color: Colors.black,
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(100),
+            borderRadius: BorderRadius.circular(5),
             borderSide: const BorderSide(
               color: Colors.black,
             ),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(100),
+            borderRadius: BorderRadius.circular(5),
             borderSide: const BorderSide(
               color: Colors.black,
             ),

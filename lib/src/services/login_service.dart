@@ -35,7 +35,7 @@ class LoginService extends ChangeNotifier {
     try {
       if (_formKey.currentState!.validate()) {
         final loginData = await Http.login(
-          'auth/local',
+          'api/auth/local',
           jsonEncode(
             {
               "identifier": _indentifier,

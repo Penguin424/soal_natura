@@ -8,11 +8,11 @@ class Http {
   }
   Http._internal();
 
-  static const IS_DEV = false;
+  static const IS_DEV = true;
 
   // static const String _host = "cosbiome.online";
   static const String _host =
-      IS_DEV ? "http://localhost:1337/" : "https://cosbiome.online/";
+      IS_DEV ? "http://192.168.1.80:1337/" : "https://cosbiome.online/";
 
   static final Map<String, String> _headers = {
     'Content-Type': 'application/json',

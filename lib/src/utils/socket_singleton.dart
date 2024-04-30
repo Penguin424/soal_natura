@@ -20,7 +20,7 @@ class SocketService {
   void connect() {
     _socket ??= IO.io(
       IS_DEV
-          ? 'http://localhost:1337/'
+          ? 'http://192.168.1.80:1337/'
           : 'https://movimiento-ciudadano-backend-0a72600137cb.herokuapp.com/',
       <String, dynamic>{
         'transports': ['websocket'],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:soal_natura/src/models/cliente_registro_form_model.dart';
-import 'package:soal_natura/src/models/cliente_search_model.dart';
+import 'package:soal_natura/src/models/ventas/cliente_registro_form_model.dart';
+import 'package:soal_natura/src/models/ventas/cliente_search_model.dart';
 import 'package:soal_natura/src/utils/http_utils.dart';
 
 class ClientesService extends ChangeNotifier {
@@ -38,8 +38,6 @@ class ClientesService extends ChangeNotifier {
         "_q": query,
       },
     );
-
-    print(clientesDB.data["data"]);
 
     clientesSearch = clientesDB.data["data"]
         .map<ClienteSearchModel>(

@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:soal_natura/src/models/venta_registro_form_model.dart';
+import 'package:soal_natura/src/models/ventas/venta_registro_form_model.dart';
 
 class VentasService extends ChangeNotifier {
   final _ventaRegistroForm = VentaRegistroFormModel(
-    productos: [
-      VentaRegistroFormModelProductos(
-        producto: 'Producto 1',
-        cantidad: 1,
-        precio: 100,
-      ),
-      VentaRegistroFormModelProductos(
-        producto: 'Producto 2',
-        cantidad: 2,
-        precio: 200,
-      ),
-    ],
+    productos: [],
+    subTotal: 0,
+    total: 0,
   );
 
   VentaRegistroFormModel get ventaRegistroForm => _ventaRegistroForm;

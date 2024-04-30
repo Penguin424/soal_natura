@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soal_natura/src/models/venta_registro_form_model.dart';
+import 'package:soal_natura/src/models/ventas/venta_registro_form_model.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:flutter/material.dart';
 

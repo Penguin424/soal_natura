@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:soal_natura/src/models/direccion_registro_form_model.dart';
+import 'package:soal_natura/src/models/ventas/direccion_registro_form_model.dart';
 
 class DireccionesService extends ChangeNotifier {
   final _direccionRegistroForm = DireccionRegistroFormModel();

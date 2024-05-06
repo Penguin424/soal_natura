@@ -18,6 +18,8 @@ class VentaRegistroFormModelProductos {
     this.producto,
     this.precio,
     this.cantidad,
+    String? nombre,
+    int? existencia,
   });
   VentaRegistroFormModelProductos.fromJson(Map<String, dynamic> json) {
     producto = json['producto']?.toString();

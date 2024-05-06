@@ -26,4 +26,35 @@ class VentasService extends ChangeNotifier {
     _ventaRegistroForm.vendedor = ventaRegistroForm.vendedor;
     notifyListeners();
   }
+
+  // Funcion para agregar Producto
+  void agregarProductos(VentaRegistroFormModelProductos producto) {
+    if (producto != null) {
+      _ventaRegistroForm.productos?.add(producto);
+
+      if (_ventaRegistroForm.productos != null) {
+        double subtotal = 0;
+        for (var producto in _ventaRegistroForm.productos!) {
+          subtotal += (producto!.precio ?? 0) * (producto.cantidad ?? 1);
+        }
+        _ventaRegistroForm.subTotal = subtotal;
+
+        double total = subtotal + 20;
+
+        _ventaRegistroForm.total = total;
+      }
+
+      notifyListeners();
+    }
+  }
+
+  // Método para actualizar la cantidad de un producto existente
+  void actualizarCantidadProducto(int index, int cantidad) {
+    if (_ventaRegistroForm.productos != null &&
+        index >= 0 &&
+        index < _ventaRegistroForm.productos!.length) {
+      _ventaRegistroForm.productos![index]?.cantidad = cantidad;
+      notifyListeners();
+    }
+  }
 }

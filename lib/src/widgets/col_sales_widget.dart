@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:soal_natura/src/models/almacen/producto_model.dart';
+import 'package:soal_natura/src/models/ventas/venta_registro_form_model.dart';
 import 'package:soal_natura/src/providers/almacen_provider.dart';
 import 'package:soal_natura/src/providers/clientes_provider.dart';
 import 'package:soal_natura/src/providers/direcciones_provider.dart';
@@ -9,13 +11,17 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class ColSalesWiget extends ConsumerStatefulWidget {
-  const ColSalesWiget({super.key});
+  ColSalesWiget({Key? key}) : super(key: key);
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ColSalesWigetState();
 }
 
 class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
+  final DataGridController _dataGridController = DataGridController();
+  int _cantidad = 1;
+  TextEditingController _cantidadController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -169,6 +175,12 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                               decoration: const InputDecoration(
                                 hintText: 'Cantidad',
                               ),
+                              controller: _cantidadController,
+                              onChanged: (value) {
+                                setState(() {
+                                  _cantidad = int.tryParse(value) ?? 1;
+                                });
+                              },
                             ),
                           ],
                         ),
@@ -197,10 +209,13 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                               );
                             },
                             optionsBuilder: (textEditingValue) {
-                              return almacen.productos
-                                  .map(
-                                    (producto) => producto.nombre!,
-                                  )
+                              final filteredProducts = almacen.productos.where(
+                                  (producto) => producto.nombre!
+                                      .toLowerCase()
+                                      .contains(
+                                          textEditingValue.text.toLowerCase()));
+                              return filteredProducts
+                                  .map((producto) => producto.nombre!)
                                   .toList();
                             },
                             optionsViewBuilder: (context, onSelected, options) {
@@ -235,12 +250,9 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                                         itemCount: options.length,
                                         itemBuilder: (context, index) {
                                           final producto = almacen.productos
-                                              .firstWhere((producto) {
-                                            final opts = options.toList();
-
-                                            return producto.nombre ==
-                                                opts[index];
-                                          });
+                                              .firstWhere((producto) =>
+                                                  producto.nombre ==
+                                                  options.elementAt(index));
 
                                           return ListTile(
                                             leading: const Icon(
@@ -258,7 +270,180 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                                               ),
                                             ),
                                             onTap: () {
-                                              onSelected(producto.nombre!);
+                                              final String
+                                                  productoSeleccionado =
+                                                  options.elementAt(index);
+
+                                              print(
+                                                  "Contenido de almacen.productos: ${almacen.productos}");
+                                              print(
+                                                  "Producto seleccionado: $productoSeleccionado");
+
+                                              final productoEncontrado =
+                                                  almacen.productos.firstWhere(
+                                                      (producto) =>
+                                                          producto.nombre ==
+                                                          productoSeleccionado,
+                                                      orElse: () =>
+                                                          ProductoModel());
+
+                                              if (productoEncontrado != null) {
+                                                print(
+                                                    'Nombre del producto encontrado: ${productoEncontrado.nombre}');
+
+                                                final cantidad = _cantidad ?? 1;
+                                                final int cantidadTotal = ventas
+                                                    .ventaRegistroForm
+                                                    .productos!
+                                                    .fold<int>(
+                                                        0,
+                                                        (previousValue,
+                                                                element) =>
+                                                            previousValue +
+                                                            (element?.cantidad ??
+                                                                0));
+                                                final List<String>
+                                                    productosExcedidos = [];
+                                                bool excedeExistencia = false;
+
+                                                if (cantidadTotal + cantidad >
+                                                    2) {
+                                                  for (final producto
+                                                      in almacen.productos) {
+                                                    final int
+                                                        cantidadDisponible =
+                                                        producto.existencia ??
+                                                            0;
+
+                                                    if (cantidadTotal +
+                                                            cantidad >
+                                                        cantidadDisponible) {
+                                                      excedeExistencia = true;
+                                                      productosExcedidos.add(
+                                                          producto.nombre ??
+                                                              '');
+                                                    }
+                                                  }
+                                                }
+                                                final cantidadTotalExistencias =
+                                                    almacen.productos.fold<int>(
+                                                        0,
+                                                        (previousValue,
+                                                                producto) =>
+                                                            previousValue +
+                                                            (producto
+                                                                    .existencia ??
+                                                                0));
+
+                                                if (excedeExistencia) {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return AlertDialog(
+                                                        title: Container(
+                                                          decoration:
+                                                              const BoxDecoration(
+                                                            color: Colors.green,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            30)),
+                                                          ),
+                                                          child: const Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        30,
+                                                                    vertical:
+                                                                        10),
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(Icons.info,
+                                                                    size: 40,
+                                                                    color: Colors
+                                                                        .red),
+                                                                SizedBox(
+                                                                    width: 20),
+                                                                Text(
+                                                                  '¡Alerta!',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .red,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        30,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        content: const Padding(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      30,
+                                                                  vertical: 10),
+                                                          child: Text(
+                                                            'La cantidad total seleccionada excede la existencia de los productos',
+                                                          ),
+                                                        ),
+                                                        actions: [
+                                                          TextButton(
+                                                            style: ButtonStyle(
+                                                              overlayColor:
+                                                                  MaterialStateProperty
+                                                                      .all(Colors
+                                                                          .yellow),
+                                                            ),
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: const Text(
+                                                              'Aceptar',
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors.red,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 18,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                } else {
+                                                  final double? precioDouble =
+                                                      productoEncontrado.precio
+                                                          ?.toDouble();
+                                                  final ventaProducto =
+                                                      VentaRegistroFormModelProductos(
+                                                    producto: productoEncontrado
+                                                        .nombre,
+                                                    existencia:
+                                                        productoEncontrado
+                                                                .existencia ??
+                                                            0,
+                                                    cantidad: cantidad,
+                                                    precio: precioDouble,
+                                                  );
+                                                  ventas.agregarProductos(
+                                                      ventaProducto);
+                                                  _dataGridController
+                                                      .notifyListeners();
+                                                  _cantidadController.clear();
+                                                }
+                                              } else {
+                                                print('Producto no encontrado');
+                                              }
                                             },
                                           );
                                         },
@@ -285,7 +470,7 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                   ),
                   child: TablaFormularioVentasWidget(
                     productos: ventas.ventaRegistroForm.productos,
-                    dataGridController: DataGridController(),
+                    dataGridController: _dataGridController,
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -427,39 +612,41 @@ class _FormRegister extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex: 3,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.star,
-                color: Colors.red,
-              ),
-              Text(text),
-            ],
-          ),
-          TextFormField(
-            decoration: InputDecoration(
-              hintText: hintText,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.star,
+                  color: Colors.red,
+                ),
+                Text(text),
+              ],
             ),
-            onChanged: onChanged,
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return 'Ingrese la información correspondiente';
-              }
-              return null;
-            },
-          ),
-        ],
+            TextFormField(
+              decoration: InputDecoration(
+                hintText: hintText,
+              ),
+              onChanged: onChanged,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Ingrese la información correspondiente';
+                }
+                return null;
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class AutocompleteSearchCliente extends ConsumerStatefulWidget {
-  const AutocompleteSearchCliente({super.key});
+  const AutocompleteSearchCliente({Key? key}) : super(key: key);
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>

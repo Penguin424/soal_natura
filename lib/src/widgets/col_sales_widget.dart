@@ -1,27 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soal_natura/src/models/almacen/producto_model.dart';
-import 'package:soal_natura/src/models/ventas/venta_registro_form_model.dart';
 import 'package:soal_natura/src/providers/almacen_provider.dart';
 import 'package:soal_natura/src/providers/clientes_provider.dart';
 import 'package:soal_natura/src/providers/direcciones_provider.dart';
 import 'package:soal_natura/src/providers/ventas_provider.dart';
+import 'package:soal_natura/src/services/ventas_services.dart';
 import 'package:soal_natura/src/widgets/tabla_formulario_ventas_widget.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
+import '../models/ventas/venta_registro_form_model.dart';
+
 class ColSalesWiget extends ConsumerStatefulWidget {
-  ColSalesWiget({Key? key}) : super(key: key);
+  const ColSalesWiget({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _ColSalesWigetState();
+  ConsumerState<ColSalesWiget> createState() => _ColSalesWidgetState();
 }
 
-class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
-  final DataGridController _dataGridController = DataGridController();
-  int _cantidad = 1;
-  TextEditingController _cantidadController = TextEditingController();
-
+class _ColSalesWidgetState extends ConsumerState<ColSalesWiget> {
   @override
   void initState() {
     super.initState();
@@ -40,6 +37,13 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
     final clientes = ref.watch(clientesProvider);
     final almacen = ref.watch(almacenProvider);
     final size = MediaQuery.of(context).size;
+    final ventasService = ref.watch(ventasServiceProvider);
+
+    final List<VentaRegistroFormModelProductos?> productos =
+        ventasService.ventaRegistroForm.productos ?? [];
+
+    final double? subtotal = ventasService.ventaRegistroForm.subTotal;
+    final double? total = ventasService.ventaRegistroForm.total;
 
     return Form(
       child: SingleChildScrollView(
@@ -56,7 +60,6 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                       hintText: 'Nombre',
                       onChanged: (value) {
                         clientes.clienteRegistroForm.nombre = value;
-
                         clientes.clienteRegistroForm =
                             clientes.clienteRegistroForm;
                       },
@@ -172,15 +175,10 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                               ],
                             ),
                             TextFormField(
+                              controller: ventasService.cantidadController,
                               decoration: const InputDecoration(
                                 hintText: 'Cantidad',
                               ),
-                              controller: _cantidadController,
-                              onChanged: (value) {
-                                setState(() {
-                                  _cantidad = int.tryParse(value) ?? 1;
-                                });
-                              },
                             ),
                           ],
                         ),
@@ -270,180 +268,25 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                                               ),
                                             ),
                                             onTap: () {
-                                              final String
-                                                  productoSeleccionado =
-                                                  options.elementAt(index);
+                                              String? nombreProducto =
+                                                  producto.nombre;
+                                              double precioProducto =
+                                                  producto.precio!.toDouble();
+                                              int cantidadProducto = int.parse(
+                                                ventasService
+                                                    .cantidadController.text,
+                                              );
+                                              int existenciaDisponible =
+                                                  producto.existencia!;
 
-                                              print(
-                                                  "Contenido de almacen.productos: ${almacen.productos}");
-                                              print(
-                                                  "Producto seleccionado: $productoSeleccionado");
-
-                                              final productoEncontrado =
-                                                  almacen.productos.firstWhere(
-                                                      (producto) =>
-                                                          producto.nombre ==
-                                                          productoSeleccionado,
-                                                      orElse: () =>
-                                                          ProductoModel());
-
-                                              if (productoEncontrado != null) {
-                                                print(
-                                                    'Nombre del producto encontrado: ${productoEncontrado.nombre}');
-
-                                                final cantidad = _cantidad ?? 1;
-                                                final int cantidadTotal = ventas
-                                                    .ventaRegistroForm
-                                                    .productos!
-                                                    .fold<int>(
-                                                        0,
-                                                        (previousValue,
-                                                                element) =>
-                                                            previousValue +
-                                                            (element?.cantidad ??
-                                                                0));
-                                                final List<String>
-                                                    productosExcedidos = [];
-                                                bool excedeExistencia = false;
-
-                                                if (cantidadTotal + cantidad >
-                                                    2) {
-                                                  for (final producto
-                                                      in almacen.productos) {
-                                                    final int
-                                                        cantidadDisponible =
-                                                        producto.existencia ??
-                                                            0;
-
-                                                    if (cantidadTotal +
-                                                            cantidad >
-                                                        cantidadDisponible) {
-                                                      excedeExistencia = true;
-                                                      productosExcedidos.add(
-                                                          producto.nombre ??
-                                                              '');
-                                                    }
-                                                  }
-                                                }
-                                                final cantidadTotalExistencias =
-                                                    almacen.productos.fold<int>(
-                                                        0,
-                                                        (previousValue,
-                                                                producto) =>
-                                                            previousValue +
-                                                            (producto
-                                                                    .existencia ??
-                                                                0));
-
-                                                if (excedeExistencia) {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return AlertDialog(
-                                                        title: Container(
-                                                          decoration:
-                                                              const BoxDecoration(
-                                                            color: Colors.green,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            30)),
-                                                          ),
-                                                          child: const Padding(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        30,
-                                                                    vertical:
-                                                                        10),
-                                                            child: Row(
-                                                              children: [
-                                                                Icon(Icons.info,
-                                                                    size: 40,
-                                                                    color: Colors
-                                                                        .red),
-                                                                SizedBox(
-                                                                    width: 20),
-                                                                Text(
-                                                                  '¡Alerta!',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .red,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontSize:
-                                                                        30,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        content: const Padding(
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  horizontal:
-                                                                      30,
-                                                                  vertical: 10),
-                                                          child: Text(
-                                                            'La cantidad total seleccionada excede la existencia de los productos',
-                                                          ),
-                                                        ),
-                                                        actions: [
-                                                          TextButton(
-                                                            style: ButtonStyle(
-                                                              overlayColor:
-                                                                  MaterialStateProperty
-                                                                      .all(Colors
-                                                                          .yellow),
-                                                            ),
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child: const Text(
-                                                              'Aceptar',
-                                                              style: TextStyle(
-                                                                color:
-                                                                    Colors.red,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 18,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      );
-                                                    },
-                                                  );
-                                                } else {
-                                                  final double? precioDouble =
-                                                      productoEncontrado.precio
-                                                          ?.toDouble();
-                                                  final ventaProducto =
-                                                      VentaRegistroFormModelProductos(
-                                                    producto: productoEncontrado
-                                                        .nombre,
-                                                    existencia:
-                                                        productoEncontrado
-                                                                .existencia ??
-                                                            0,
-                                                    cantidad: cantidad,
-                                                    precio: precioDouble,
-                                                  );
-                                                  ventas.agregarProductos(
-                                                      ventaProducto);
-                                                  _dataGridController
-                                                      .notifyListeners();
-                                                  _cantidadController.clear();
-                                                }
-                                              } else {
-                                                print('Producto no encontrado');
-                                              }
+                                              ventasService
+                                                  .agregarProductoDesdeInterfaz(
+                                                nombreProducto!,
+                                                precioProducto,
+                                                cantidadProducto,
+                                                existenciaDisponible,
+                                                context,
+                                              );
                                             },
                                           );
                                         },
@@ -469,8 +312,8 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                     selectionColor: Colors.orange[200],
                   ),
                   child: TablaFormularioVentasWidget(
-                    productos: ventas.ventaRegistroForm.productos,
-                    dataGridController: _dataGridController,
+                    productos: productos,
+                    dataGridController: DataGridController(),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -487,7 +330,7 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                           ),
                         ),
                         Text(
-                          "\$ ${ventas.ventaRegistroForm.subTotal}",
+                          "\$ $subtotal",
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -523,7 +366,7 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                           ),
                         ),
                         Text(
-                          "\$ ${ventas.ventaRegistroForm.total}",
+                          "\$ $total",
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -649,7 +492,7 @@ class AutocompleteSearchCliente extends ConsumerStatefulWidget {
   const AutocompleteSearchCliente({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
+  ConsumerState<AutocompleteSearchCliente> createState() =>
       _AutocompleteSearchClienteState();
 }
 

@@ -4,18 +4,21 @@ import 'package:soal_natura/src/providers/almacen_provider.dart';
 import 'package:soal_natura/src/providers/clientes_provider.dart';
 import 'package:soal_natura/src/providers/direcciones_provider.dart';
 import 'package:soal_natura/src/providers/ventas_provider.dart';
+import 'package:soal_natura/src/services/ventas_services.dart';
 import 'package:soal_natura/src/widgets/tabla_formulario_ventas_widget.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
+import '../models/ventas/venta_registro_form_model.dart';
+
 class ColSalesWiget extends ConsumerStatefulWidget {
-  const ColSalesWiget({super.key});
+  const ColSalesWiget({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _ColSalesWigetState();
+  ConsumerState<ColSalesWiget> createState() => _ColSalesWidgetState();
 }
 
-class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
+class _ColSalesWidgetState extends ConsumerState<ColSalesWiget> {
   @override
   void initState() {
     super.initState();
@@ -34,6 +37,13 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
     final clientes = ref.watch(clientesProvider);
     final almacen = ref.watch(almacenProvider);
     final size = MediaQuery.of(context).size;
+    final ventasService = ref.watch(ventasServiceProvider);
+
+    final List<VentaRegistroFormModelProductos?> productos =
+        ventasService.ventaRegistroForm.productos ?? [];
+
+    final double? subtotal = ventasService.ventaRegistroForm.subTotal;
+    final double? total = ventasService.ventaRegistroForm.total;
 
     return Form(
       child: SingleChildScrollView(
@@ -50,7 +60,6 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                       hintText: 'Nombre',
                       onChanged: (value) {
                         clientes.clienteRegistroForm.nombre = value;
-
                         clientes.clienteRegistroForm =
                             clientes.clienteRegistroForm;
                       },
@@ -166,6 +175,7 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                               ],
                             ),
                             TextFormField(
+                              controller: ventasService.cantidadController,
                               decoration: const InputDecoration(
                                 hintText: 'Cantidad',
                               ),
@@ -197,10 +207,13 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                               );
                             },
                             optionsBuilder: (textEditingValue) {
-                              return almacen.productos
-                                  .map(
-                                    (producto) => producto.nombre!,
-                                  )
+                              final filteredProducts = almacen.productos.where(
+                                  (producto) => producto.nombre!
+                                      .toLowerCase()
+                                      .contains(
+                                          textEditingValue.text.toLowerCase()));
+                              return filteredProducts
+                                  .map((producto) => producto.nombre!)
                                   .toList();
                             },
                             optionsViewBuilder: (context, onSelected, options) {
@@ -235,12 +248,9 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                                         itemCount: options.length,
                                         itemBuilder: (context, index) {
                                           final producto = almacen.productos
-                                              .firstWhere((producto) {
-                                            final opts = options.toList();
-
-                                            return producto.nombre ==
-                                                opts[index];
-                                          });
+                                              .firstWhere((producto) =>
+                                                  producto.nombre ==
+                                                  options.elementAt(index));
 
                                           return ListTile(
                                             leading: const Icon(
@@ -258,7 +268,25 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                                               ),
                                             ),
                                             onTap: () {
-                                              onSelected(producto.nombre!);
+                                              String? nombreProducto =
+                                                  producto.nombre;
+                                              double precioProducto =
+                                                  producto.precio!.toDouble();
+                                              int cantidadProducto = int.parse(
+                                                ventasService
+                                                    .cantidadController.text,
+                                              );
+                                              int existenciaDisponible =
+                                                  producto.existencia!;
+
+                                              ventasService
+                                                  .agregarProductoDesdeInterfaz(
+                                                nombreProducto!,
+                                                precioProducto,
+                                                cantidadProducto,
+                                                existenciaDisponible,
+                                                context,
+                                              );
                                             },
                                           );
                                         },
@@ -284,7 +312,7 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                     selectionColor: Colors.orange[200],
                   ),
                   child: TablaFormularioVentasWidget(
-                    productos: ventas.ventaRegistroForm.productos,
+                    productos: productos,
                     dataGridController: DataGridController(),
                   ),
                 ),
@@ -302,7 +330,7 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                           ),
                         ),
                         Text(
-                          "\$ ${ventas.ventaRegistroForm.subTotal}",
+                          "\$ $subtotal",
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -338,7 +366,7 @@ class _ColSalesWigetState extends ConsumerState<ColSalesWiget> {
                           ),
                         ),
                         Text(
-                          "\$ ${ventas.ventaRegistroForm.total}",
+                          "\$ $total",
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -427,42 +455,44 @@ class _FormRegister extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      flex: 3,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.star,
-                color: Colors.red,
-              ),
-              Text(text),
-            ],
-          ),
-          TextFormField(
-            decoration: InputDecoration(
-              hintText: hintText,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                const Icon(
+                  Icons.star,
+                  color: Colors.red,
+                ),
+                Text(text),
+              ],
             ),
-            onChanged: onChanged,
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return 'Ingrese la información correspondiente';
-              }
-              return null;
-            },
-          ),
-        ],
+            TextFormField(
+              decoration: InputDecoration(
+                hintText: hintText,
+              ),
+              onChanged: onChanged,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Ingrese la información correspondiente';
+                }
+                return null;
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class AutocompleteSearchCliente extends ConsumerStatefulWidget {
-  const AutocompleteSearchCliente({super.key});
+  const AutocompleteSearchCliente({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
+  ConsumerState<AutocompleteSearchCliente> createState() =>
       _AutocompleteSearchClienteState();
 }
 
